@@ -1,15 +1,14 @@
-import { useState } from 'react';
 import {
   Button,
   Modal,
-  Stack,
   Select,
-  Textarea,
   Slider,
+  Stack,
   Text,
-  NumberInput,
+  Textarea,
 } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
+import { useState } from 'react';
 
 interface ChatSettings {
   model: string;
@@ -66,7 +65,10 @@ function SettingsButton({ settings, onSettingsChange }: SettingsButtonProps) {
             data={MODEL_OPTIONS}
             value={localSettings.model}
             onChange={(value) =>
-              setLocalSettings({ ...localSettings, model: value || 'gpt-4o-mini' })
+              setLocalSettings({
+                ...localSettings,
+                model: value || 'gpt-4o-mini',
+              })
             }
           />
 
@@ -109,7 +111,9 @@ function SettingsButton({ settings, onSettingsChange }: SettingsButtonProps) {
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+          <div
+            style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}
+          >
             <Button variant="outline" onClick={handleCancel}>
               Cancel
             </Button>

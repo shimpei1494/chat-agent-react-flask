@@ -1,5 +1,5 @@
-import { Paper, Text, Group, Avatar } from '@mantine/core';
-import { IconUser, IconRobot } from '@tabler/icons-react';
+import { Avatar, Group, Paper, Text } from '@mantine/core';
+import { IconRobot, IconUser } from '@tabler/icons-react';
 import DOMPurify from 'dompurify';
 
 interface Message {
