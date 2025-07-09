@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { Container, Stack } from '@mantine/core';
-import QuestionInput from '../../components/QuestionInput/QuestionInput';
+import { useState } from 'react';
 import Answer from '../../components/Answer/Answer';
 import ClearChatButton from '../../components/ClearChatButton/ClearChatButton';
+import QuestionInput from '../../components/QuestionInput/QuestionInput';
 import SettingsButton from '../../components/SettingsButton/SettingsButton';
 
 interface Message {
@@ -87,14 +87,23 @@ function ChatPage() {
   return (
     <Container size="lg" h="100vh">
       <Stack h="100%" gap="md">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
           <h1>AI Chat Agent</h1>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <SettingsButton settings={settings} onSettingsChange={setSettings} />
+            <SettingsButton
+              settings={settings}
+              onSettingsChange={setSettings}
+            />
             <ClearChatButton onClear={handleClearChat} />
           </div>
         </div>
-        
+
         <div style={{ flex: 1, overflow: 'auto' }}>
           <Stack gap="md">
             {messages.map((message) => (

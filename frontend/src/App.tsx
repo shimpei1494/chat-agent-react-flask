@@ -1,5 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
 import { AppShell } from '@mantine/core';
+import { Route, Routes } from 'react-router-dom';
 import ChatPage from './pages/chat/ChatPage';
 
 function App() {
