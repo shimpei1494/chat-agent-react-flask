@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
 import { Avatar, Box, Group, Paper, Text } from "@mantine/core";
 import { IconRobot } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import styles from "./Answer.module.css";
 
 interface Message {
@@ -89,18 +90,31 @@ function Answer({ message }: AnswerProps) {
 						)}
 
 						{/* Message text */}
-						<Text
-							size="sm"
-							c={isUser ? "white" : "dark"}
-							style={{
-								whiteSpace: "pre-wrap",
-								wordBreak: "break-word",
-								lineHeight: 1.5,
-								fontWeight: isUser ? 500 : 400,
-							}}
-						>
-							{message.content}
-						</Text>
+						{isUser ? (
+							<Text
+								size="sm"
+								c="white"
+								style={{
+									whiteSpace: "pre-wrap",
+									wordBreak: "break-word",
+									lineHeight: 1.5,
+									fontWeight: 500,
+								}}
+							>
+								{message.content}
+							</Text>
+						) : (
+							<Box
+								className={styles.markdownContent}
+								style={{
+									color: "var(--mantine-color-dark-7)",
+									fontSize: "14px",
+									lineHeight: 1.5,
+								}}
+							>
+								<ReactMarkdown>{message.content}</ReactMarkdown>
+							</Box>
+						)}
 
 						{/* Timestamp */}
 						<Text

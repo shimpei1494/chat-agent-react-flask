@@ -106,10 +106,12 @@ function ChatHistory({
 			p={isCollapsed ? "sm" : "lg"}
 			h="100%"
 			style={{
-				background: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 242, 255, 0.9) 100%)",
+				background:
+					"linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 242, 255, 0.9) 100%)",
 				backdropFilter: "blur(20px)",
 				border: "none",
-				boxShadow: "0 4px 20px rgba(102, 126, 234, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)",
+				boxShadow:
+					"0 4px 20px rgba(102, 126, 234, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)",
 				width: isCollapsed ? "80px" : "350px",
 				transition: "all 0.3s ease",
 				position: "relative",
@@ -255,9 +257,10 @@ function ChatHistory({
 											border: "1px solid transparent",
 											cursor: "pointer",
 											transition: "all 0.2s ease",
-											boxShadow: currentThreadId === thread.id
-												? "0 2px 8px rgba(102, 126, 234, 0.1)"
-												: "none",
+											boxShadow:
+												currentThreadId === thread.id
+													? "0 2px 8px rgba(102, 126, 234, 0.1)"
+													: "none",
 										}}
 										onMouseEnter={() => setHoveredThread(thread.id)}
 										onMouseLeave={() => setHoveredThread(null)}
@@ -286,7 +289,7 @@ function ChatHistory({
 												</Group>
 											</Box>
 
-											<Box 
+											<Box
 												style={{
 													width: "44px", // Fixed width to prevent layout shifts
 													display: "flex",
