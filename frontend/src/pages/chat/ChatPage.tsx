@@ -1,15 +1,7 @@
-import {
-	Box,
-	Card,
-	Container,
-	Flex,
-	Group,
-	Stack,
-	Text,
-	Title,
-} from "@mantine/core";
+import { Box, Card, Flex, Group, Stack, Text, Title } from "@mantine/core";
 import { useState } from "react";
 import Answer from "../../components/Answer/Answer";
+import ChatHistory from "../../components/ChatHistory/ChatHistory";
 import ClearChatButton from "../../components/ClearChatButton/ClearChatButton";
 import QuestionInput from "../../components/QuestionInput/QuestionInput";
 import SettingsButton from "../../components/SettingsButton/SettingsButton";
@@ -30,6 +22,7 @@ interface ChatSettings {
 function ChatPage() {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 	const [settings, setSettings] = useState<ChatSettings>({
 		model: "gpt-4o-mini",
 		systemPrompt: "You are a helpful AI assistant.",
@@ -93,6 +86,14 @@ function ChatPage() {
 		setMessages([]);
 	};
 
+	const handleNewChat = () => {
+		setMessages([]);
+	};
+
+	const handleToggleSidebar = () => {
+		setIsSidebarCollapsed(!isSidebarCollapsed);
+	};
+
 	return (
 		<Box
 			h="100vh"
@@ -118,124 +119,137 @@ function ChatPage() {
 				}}
 			/>
 
-			<Container size="lg" h="100%" style={{ position: "relative", zIndex: 1 }}>
-				<Stack h="100%" gap="md" py="md">
-					{/* Modern Header */}
-					<Card
-						shadow="xl"
-						padding="lg"
-						radius="xl"
-						style={{
-							background: "rgba(255, 255, 255, 0.95)",
-							backdropFilter: "blur(20px)",
-							border: "1px solid rgba(255, 255, 255, 0.2)",
-						}}
-					>
-						<Flex justify="space-between" align="center">
-							<Box>
-								<Title
-									order={1}
-									size="2rem"
-									style={{
-										background: "linear-gradient(45deg, #667eea, #764ba2)",
-										WebkitBackgroundClip: "text",
-										WebkitTextFillColor: "transparent",
-										fontWeight: 800,
-										letterSpacing: "-0.5px",
-									}}
-								>
-									AI Chat Agent
-								</Title>
-								<Text c="dimmed" size="sm" mt={2}>
-									Powered by advanced AI models
-								</Text>
-							</Box>
-							<Group gap="xs">
-								<SettingsButton
-									settings={settings}
-									onSettingsChange={setSettings}
-								/>
-								<ClearChatButton onClear={handleClearChat} />
-							</Group>
-						</Flex>
-					</Card>
+			{/* Main layout with sidebar */}
+			<Flex h="100%" style={{ position: "relative", zIndex: 1 }}>
+				{/* Left Sidebar */}
+				<Box p="md" style={{ flexShrink: 0 }}>
+					<ChatHistory
+						isCollapsed={isSidebarCollapsed}
+						onToggle={handleToggleSidebar}
+						onNewChat={handleNewChat}
+					/>
+				</Box>
 
-					{/* Chat Area */}
-					<Card
-						shadow="xl"
-						radius="xl"
-						p="lg"
-						style={{
-							flex: 1,
-							background: "rgba(255, 255, 255, 0.95)",
-							backdropFilter: "blur(20px)",
-							border: "1px solid rgba(255, 255, 255, 0.2)",
-							overflow: "hidden",
-						}}
-					>
-						<Box h="100%" style={{ overflow: "auto" }}>
-							{messages.length === 0 ? (
-								<Flex
-									h="100%"
-									direction="column"
-									justify="center"
-									align="center"
-									gap="md"
-								>
-									<Box
-										w={120}
-										h={120}
+				{/* Main Content Area */}
+				<Box flex={1} p="md" pl={0}>
+					<Stack h="100%" gap="md">
+						{/* Modern Header */}
+						<Card
+							shadow="xl"
+							padding="lg"
+							radius="xl"
+							style={{
+								background: "rgba(255, 255, 255, 0.95)",
+								backdropFilter: "blur(20px)",
+								border: "1px solid rgba(255, 255, 255, 0.2)",
+							}}
+						>
+							<Flex justify="space-between" align="center">
+								<Box>
+									<Title
+										order={1}
+										size="2rem"
 										style={{
-											background:
-												"linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-											borderRadius: "50%",
-											display: "flex",
-											alignItems: "center",
-											justifyContent: "center",
-											boxShadow: "0 20px 40px rgba(102, 126, 234, 0.3)",
+											background: "linear-gradient(45deg, #667eea, #764ba2)",
+											WebkitBackgroundClip: "text",
+											WebkitTextFillColor: "transparent",
+											fontWeight: 800,
+											letterSpacing: "-0.5px",
 										}}
 									>
-										<Text
-											size="3rem"
+										AI Chat Agent
+									</Title>
+									<Text c="dimmed" size="sm" mt={2}>
+										Powered by advanced AI models
+									</Text>
+								</Box>
+								<Group gap="xs">
+									<SettingsButton
+										settings={settings}
+										onSettingsChange={setSettings}
+									/>
+									<ClearChatButton onClear={handleClearChat} />
+								</Group>
+							</Flex>
+						</Card>
+
+						{/* Chat Area */}
+						<Card
+							shadow="xl"
+							radius="xl"
+							p="lg"
+							style={{
+								flex: 1,
+								background: "rgba(255, 255, 255, 0.95)",
+								backdropFilter: "blur(20px)",
+								border: "1px solid rgba(255, 255, 255, 0.2)",
+								overflow: "hidden",
+							}}
+						>
+							<Box h="100%" style={{ overflow: "auto" }}>
+								{messages.length === 0 ? (
+									<Flex
+										h="100%"
+										direction="column"
+										justify="center"
+										align="center"
+										gap="md"
+									>
+										<Box
+											w={120}
+											h={120}
 											style={{
-												filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))",
+												background:
+													"linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+												borderRadius: "50%",
+												display: "flex",
+												alignItems: "center",
+												justifyContent: "center",
+												boxShadow: "0 20px 40px rgba(102, 126, 234, 0.3)",
 											}}
 										>
-											🤖
+											<Text
+												size="3rem"
+												style={{
+													filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))",
+												}}
+											>
+												🤖
+											</Text>
+										</Box>
+										<Title order={3} ta="center" c="dimmed">
+											こんにちは！何かお手伝いできることはありますか？
+										</Title>
+										<Text ta="center" c="dimmed" size="sm">
+											何でもお気軽にお聞きください。AIがお答えします。
 										</Text>
-									</Box>
-									<Title order={3} ta="center" c="dimmed">
-										こんにちは！何かお手伝いできることはありますか？
-									</Title>
-									<Text ta="center" c="dimmed" size="sm">
-										何でもお気軽にお聞きください。AIがお答えします。
-									</Text>
-								</Flex>
-							) : (
-								<Stack gap="md">
-									{messages.map((message) => (
-										<Answer key={message.id} message={message} />
-									))}
-								</Stack>
-							)}
-						</Box>
-					</Card>
+									</Flex>
+								) : (
+									<Stack gap="md">
+										{messages.map((message) => (
+											<Answer key={message.id} message={message} />
+										))}
+									</Stack>
+								)}
+							</Box>
+						</Card>
 
-					{/* Input Area */}
-					<Card
-						shadow="xl"
-						padding="lg"
-						radius="xl"
-						style={{
-							background: "rgba(255, 255, 255, 0.95)",
-							backdropFilter: "blur(20px)",
-							border: "1px solid rgba(255, 255, 255, 0.2)",
-						}}
-					>
-						<QuestionInput onSend={handleSendMessage} disabled={isLoading} />
-					</Card>
-				</Stack>
-			</Container>
+						{/* Input Area */}
+						<Card
+							shadow="xl"
+							padding="lg"
+							radius="xl"
+							style={{
+								background: "rgba(255, 255, 255, 0.95)",
+								backdropFilter: "blur(20px)",
+								border: "1px solid rgba(255, 255, 255, 0.2)",
+							}}
+						>
+							<QuestionInput onSend={handleSendMessage} disabled={isLoading} />
+						</Card>
+					</Stack>
+				</Box>
+			</Flex>
 		</Box>
 	);
 }
