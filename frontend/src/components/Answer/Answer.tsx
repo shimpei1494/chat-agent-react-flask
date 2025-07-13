@@ -19,24 +19,44 @@ function Answer({ message }: AnswerProps) {
 
   return (
     <Paper
-      p="md"
-      shadow="sm"
+      p="lg"
+      radius="xl"
+      shadow="md"
       style={{
-        backgroundColor: isUser ? '#f0f9ff' : '#fafafa',
-        marginLeft: isUser ? '20%' : '0',
-        marginRight: isUser ? '0' : '20%',
+        background: isUser 
+          ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)'
+          : 'rgba(255, 255, 255, 0.9)',
+        marginLeft: isUser ? '15%' : '0',
+        marginRight: isUser ? '0' : '15%',
+        border: `1px solid ${isUser ? 'rgba(102, 126, 234, 0.2)' : 'rgba(0, 0, 0, 0.1)'}`,
+        backdropFilter: 'blur(10px)',
+        transition: 'all 0.3s ease',
       }}
     >
-      <Group align="flex-start" gap="sm">
-        <Avatar size="sm" color={isUser ? 'blue' : 'gray'}>
-          {isUser ? <IconUser size={16} /> : <IconRobot size={16} />}
+      <Group align="flex-start" gap="md">
+        <Avatar 
+          size="md" 
+          radius="xl"
+          style={{
+            background: isUser 
+              ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+              : 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.15)',
+          }}
+        >
+          {isUser ? <IconUser size={18} /> : <IconRobot size={18} />}
         </Avatar>
         <div style={{ flex: 1 }}>
-          <Text size="sm" c="dimmed" mb={4}>
-            {isUser ? 'You' : 'Assistant'}
+          <Text size="sm" c="dimmed" mb={6} fw={500}>
+            {isUser ? 'あなた' : 'AI アシスタント'}
           </Text>
           <Text
-            style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+            size="sm"
+            style={{ 
+              whiteSpace: 'pre-wrap', 
+              wordBreak: 'break-word',
+              lineHeight: 1.6,
+            }}
             dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           />
         </div>

@@ -45,11 +45,27 @@ function SettingsButton({ settings, onSettingsChange }: SettingsButtonProps) {
   return (
     <>
       <Button
-        variant="outline"
+        variant="light"
         leftSection={<IconSettings size={16} />}
         onClick={() => setOpened(true)}
+        radius="xl"
+        style={{
+          background: 'rgba(102, 126, 234, 0.1)',
+          border: '1px solid rgba(102, 126, 234, 0.3)',
+          color: '#667eea',
+          transition: 'all 0.3s ease',
+        }}
+        styles={{
+          root: {
+            '&:hover': {
+              background: 'rgba(102, 126, 234, 0.2)',
+              transform: 'translateY(-1px)',
+              boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
+            },
+          },
+        }}
       >
-        Settings
+        設定
       </Button>
 
       <Modal
