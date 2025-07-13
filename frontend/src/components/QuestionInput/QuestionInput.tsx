@@ -19,7 +19,7 @@ function QuestionInput({ onSend, disabled = false }: QuestionInputProps) {
 	};
 
 	const handleKeyDown = (event: React.KeyboardEvent) => {
-		if (event.key === "Enter" && !event.shiftKey) {
+		if (event.key === "Enter" && event.ctrlKey) {
 			event.preventDefault();
 			handleSubmit();
 		}
@@ -39,7 +39,7 @@ function QuestionInput({ onSend, disabled = false }: QuestionInputProps) {
 		>
 			<Group align="flex-end" gap="xs">
 				<Textarea
-					placeholder="メッセージを入力してください... (Enterで送信、Shift+Enterで改行)"
+					placeholder="メッセージを入力してください... (Ctrl+Enterで送信、Enterで改行)"
 					value={input}
 					onChange={(event) => setInput(event.currentTarget.value)}
 					onKeyDown={handleKeyDown}
