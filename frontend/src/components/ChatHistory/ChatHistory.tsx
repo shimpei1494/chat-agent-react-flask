@@ -102,14 +102,14 @@ function ChatHistory({
 
 	return (
 		<Card
-			shadow="xl"
 			radius="xl"
 			p={isCollapsed ? "sm" : "lg"}
 			h="100%"
 			style={{
-				background: "rgba(255, 255, 255, 0.95)",
+				background: "linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 242, 255, 0.9) 100%)",
 				backdropFilter: "blur(20px)",
-				border: "1px solid rgba(255, 255, 255, 0.2)",
+				border: "none",
+				boxShadow: "0 4px 20px rgba(102, 126, 234, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)",
 				width: isCollapsed ? "80px" : "350px",
 				transition: "all 0.3s ease",
 				position: "relative",
@@ -248,17 +248,16 @@ function ChatHistory({
 										style={{
 											background:
 												currentThreadId === thread.id
-													? "linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)"
+													? "linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.08) 100%)"
 													: hoveredThread === thread.id
-														? "rgba(102, 126, 234, 0.05)"
+														? "rgba(102, 126, 234, 0.04)"
 														: "transparent",
-											border: `1px solid ${
-												currentThreadId === thread.id
-													? "rgba(102, 126, 234, 0.3)"
-													: "rgba(0, 0, 0, 0.05)"
-											}`,
+											border: "1px solid transparent",
 											cursor: "pointer",
 											transition: "all 0.2s ease",
+											boxShadow: currentThreadId === thread.id
+												? "0 2px 8px rgba(102, 126, 234, 0.1)"
+												: "none",
 										}}
 										onMouseEnter={() => setHoveredThread(thread.id)}
 										onMouseLeave={() => setHoveredThread(null)}
@@ -287,32 +286,41 @@ function ChatHistory({
 												</Group>
 											</Box>
 
-											{hoveredThread === thread.id && (
-												<Group gap={2}>
-													<ActionIcon
-														size="xs"
-														variant="subtle"
-														color="blue"
-														onClick={(e) => {
-															e.stopPropagation();
-															onRenameThread?.(thread.id, thread.title);
-														}}
-													>
-														<IconEdit size={12} />
-													</ActionIcon>
-													<ActionIcon
-														size="xs"
-														variant="subtle"
-														color="red"
-														onClick={(e) => {
-															e.stopPropagation();
-															onDeleteThread?.(thread.id);
-														}}
-													>
-														<IconTrash size={12} />
-													</ActionIcon>
-												</Group>
-											)}
+											<Box 
+												style={{
+													width: "44px", // Fixed width to prevent layout shifts
+													display: "flex",
+													justifyContent: "flex-end",
+													alignItems: "flex-start",
+												}}
+											>
+												{hoveredThread === thread.id && (
+													<Group gap={4}>
+														<ActionIcon
+															size="sm"
+															variant="subtle"
+															color="blue"
+															onClick={(e) => {
+																e.stopPropagation();
+																onRenameThread?.(thread.id, thread.title);
+															}}
+														>
+															<IconEdit size={16} />
+														</ActionIcon>
+														<ActionIcon
+															size="sm"
+															variant="subtle"
+															color="red"
+															onClick={(e) => {
+																e.stopPropagation();
+																onDeleteThread?.(thread.id);
+															}}
+														>
+															<IconTrash size={16} />
+														</ActionIcon>
+													</Group>
+												)}
+											</Box>
 										</Group>
 									</Card>
 								))}

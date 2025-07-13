@@ -1,5 +1,7 @@
-import { Avatar, Group, Paper, Text } from "@mantine/core";
-import { IconRobot, IconUser } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
+import { Avatar, Box, Group, Paper, Text } from "@mantine/core";
+import { IconRobot } from "@tabler/icons-react";
+import styles from "./Answer.module.css";
 
 interface Message {
 	id: string;
@@ -14,53 +16,111 @@ interface AnswerProps {
 
 function Answer({ message }: AnswerProps) {
 	const isUser = message.role === "user";
+	const [isVisible, setIsVisible] = useState(false);
+
+	useEffect(() => {
+		const timer = setTimeout(() => setIsVisible(true), 100);
+		return () => clearTimeout(timer);
+	}, []);
 
 	return (
-		<Paper
-			p="lg"
-			radius="xl"
-			shadow="md"
+		<Box
+			className={`${styles.messageContainer} ${isVisible ? styles.fadeIn : ""}`}
 			style={{
-				background: isUser
-					? "linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)"
-					: "rgba(255, 255, 255, 0.9)",
-				marginLeft: isUser ? "15%" : "0",
-				marginRight: isUser ? "0" : "15%",
-				border: `1px solid ${isUser ? "rgba(102, 126, 234, 0.2)" : "rgba(0, 0, 0, 0.1)"}`,
-				backdropFilter: "blur(10px)",
-				transition: "all 0.3s ease",
+				display: "flex",
+				justifyContent: isUser ? "flex-end" : "flex-start",
+				marginBottom: "16px",
+				opacity: isVisible ? 1 : 0,
 			}}
 		>
-			<Group align="flex-start" gap="md">
-				<Avatar
-					size="md"
-					radius="xl"
+			<Group
+				align="flex-start"
+				gap="xs"
+				style={{
+					maxWidth: "75%",
+					flexDirection: isUser ? "row-reverse" : "row",
+				}}
+			>
+				{/* Avatar - Hidden for user messages in modern chat style */}
+				{!isUser && (
+					<Avatar
+						size={36}
+						radius="xl"
+						style={{
+							background: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+							boxShadow: "0 3px 12px rgba(0, 0, 0, 0.08)",
+							flexShrink: 0,
+						}}
+					>
+						<IconRobot size={16} color="white" />
+					</Avatar>
+				)}
+
+				{/* Message bubble */}
+				<Paper
+					className={`${styles.messageHover} ${isUser ? styles.userMessageHover : styles.aiMessageHover}`}
+					p="md"
+					radius={isUser ? "20px 20px 4px 20px" : "20px 20px 20px 4px"}
 					style={{
 						background: isUser
 							? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-							: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
-						boxShadow: "0 4px 15px rgba(0, 0, 0, 0.15)",
+							: "rgba(255, 255, 255, 0.95)",
+						border: "none",
+						backdropFilter: "blur(20px)",
+						boxShadow: isUser
+							? "0 4px 20px rgba(102, 126, 234, 0.25), 0 2px 8px rgba(0, 0, 0, 0.05)"
+							: "0 2px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05)",
+						position: "relative",
 					}}
 				>
-					{isUser ? <IconUser size={18} /> : <IconRobot size={18} />}
-				</Avatar>
-				<div style={{ flex: 1 }}>
-					<Text size="sm" c="dimmed" mb={6} fw={500}>
-						{isUser ? "あなた" : "AI アシスタント"}
-					</Text>
-					<Text
-						size="sm"
-						style={{
-							whiteSpace: "pre-wrap",
-							wordBreak: "break-word",
-							lineHeight: 1.6,
-						}}
-					>
-						{message.content}
-					</Text>
-				</div>
+					{/* Message content */}
+					<Box>
+						{/* Label - Only show for AI */}
+						{!isUser && (
+							<Text
+								size="xs"
+								c="dimmed"
+								mb={4}
+								fw={500}
+								style={{ opacity: 0.8 }}
+							>
+								AI アシスタント
+							</Text>
+						)}
+
+						{/* Message text */}
+						<Text
+							size="sm"
+							c={isUser ? "white" : "dark"}
+							style={{
+								whiteSpace: "pre-wrap",
+								wordBreak: "break-word",
+								lineHeight: 1.5,
+								fontWeight: isUser ? 500 : 400,
+							}}
+						>
+							{message.content}
+						</Text>
+
+						{/* Timestamp */}
+						<Text
+							size="xs"
+							c={isUser ? "rgba(255, 255, 255, 0.7)" : "dimmed"}
+							mt={4}
+							style={{
+								textAlign: isUser ? "right" : "left",
+								opacity: 0.6,
+							}}
+						>
+							{new Date(message.timestamp).toLocaleTimeString("ja-JP", {
+								hour: "2-digit",
+								minute: "2-digit",
+							})}
+						</Text>
+					</Box>
+				</Paper>
 			</Group>
-		</Paper>
+		</Box>
 	);
 }
 

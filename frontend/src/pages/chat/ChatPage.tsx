@@ -1,10 +1,22 @@
-import { Box, Card, Flex, Group, Stack, Text, Title } from "@mantine/core";
+import {
+	Avatar,
+	Box,
+	Card,
+	Flex,
+	Group,
+	Paper,
+	Stack,
+	Text,
+	Title,
+} from "@mantine/core";
+import { IconRobot } from "@tabler/icons-react";
 import { useState } from "react";
 import Answer from "../../components/Answer/Answer";
 import ChatHistory from "../../components/ChatHistory/ChatHistory";
 import ClearChatButton from "../../components/ClearChatButton/ClearChatButton";
 import QuestionInput from "../../components/QuestionInput/QuestionInput";
 import SettingsButton from "../../components/SettingsButton/SettingsButton";
+import styles from "./ChatPage.module.css";
 
 interface Message {
 	id: string;
@@ -22,6 +34,7 @@ interface ChatSettings {
 function ChatPage() {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
+	const [typingIndicator, setTypingIndicator] = useState(false);
 	const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 	const [settings, setSettings] = useState<ChatSettings>({
 		model: "gpt-4o-mini",
@@ -39,6 +52,7 @@ function ChatPage() {
 
 		setMessages((prev) => [...prev, userMessage]);
 		setIsLoading(true);
+		setTypingIndicator(true);
 
 		try {
 			const response = await fetch("/api/v1/chat", {
@@ -68,6 +82,7 @@ function ChatPage() {
 			};
 
 			setMessages((prev) => [...prev, assistantMessage]);
+			setTypingIndicator(false);
 		} catch (error) {
 			console.error("Error:", error);
 			const errorMessage: Message = {
@@ -77,8 +92,10 @@ function ChatPage() {
 				timestamp: Date.now(),
 			};
 			setMessages((prev) => [...prev, errorMessage]);
+			setTypingIndicator(false);
 		} finally {
 			setIsLoading(false);
+			setTypingIndicator(false);
 		}
 	};
 
@@ -135,13 +152,15 @@ function ChatPage() {
 					<Stack h="100%" gap="md">
 						{/* Modern Header */}
 						<Card
-							shadow="xl"
 							padding="lg"
 							radius="xl"
 							style={{
-								background: "rgba(255, 255, 255, 0.95)",
+								background:
+									"linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 242, 255, 0.9) 100%)",
 								backdropFilter: "blur(20px)",
-								border: "1px solid rgba(255, 255, 255, 0.2)",
+								border: "none",
+								boxShadow:
+									"0 4px 20px rgba(102, 126, 234, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)",
 							}}
 						>
 							<Flex justify="space-between" align="center">
@@ -175,18 +194,24 @@ function ChatPage() {
 
 						{/* Chat Area */}
 						<Card
-							shadow="xl"
 							radius="xl"
 							p="lg"
 							style={{
 								flex: 1,
-								background: "rgba(255, 255, 255, 0.95)",
+								background:
+									"linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 255, 0.8) 100%)",
 								backdropFilter: "blur(20px)",
-								border: "1px solid rgba(255, 255, 255, 0.2)",
+								border: "none",
+								boxShadow:
+									"0 4px 20px rgba(102, 126, 234, 0.06), 0 1px 3px rgba(0, 0, 0, 0.05)",
 								overflow: "hidden",
 							}}
 						>
-							<Box h="100%" style={{ overflow: "auto" }}>
+							<Box
+								h="100%"
+								className={styles.chatArea}
+								style={{ overflow: "auto", padding: "16px" }}
+							>
 								{messages.length === 0 ? (
 									<Flex
 										h="100%"
@@ -200,7 +225,7 @@ function ChatPage() {
 											h={120}
 											style={{
 												background:
-													"linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+													"linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
 												borderRadius: "50%",
 												display: "flex",
 												alignItems: "center",
@@ -208,14 +233,7 @@ function ChatPage() {
 												boxShadow: "0 20px 40px rgba(102, 126, 234, 0.3)",
 											}}
 										>
-											<Text
-												size="3rem"
-												style={{
-													filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.2))",
-												}}
-											>
-												🤖
-											</Text>
+											<IconRobot size={48} color="white" />
 										</Box>
 										<Title order={3} ta="center" c="dimmed">
 											こんにちは！何かお手伝いできることはありますか？
@@ -225,24 +243,75 @@ function ChatPage() {
 										</Text>
 									</Flex>
 								) : (
-									<Stack gap="md">
+									<Box>
 										{messages.map((message) => (
 											<Answer key={message.id} message={message} />
 										))}
-									</Stack>
+
+										{/* Typing Indicator */}
+										{typingIndicator && (
+											<Box
+												className={styles.typingIndicator}
+												style={{
+													display: "flex",
+													justifyContent: "flex-start",
+													marginBottom: "16px",
+												}}
+											>
+												<Group align="flex-start" gap="xs">
+													<Avatar
+														size={36}
+														radius="xl"
+														style={{
+															background:
+																"linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+															boxShadow: "0 3px 12px rgba(0, 0, 0, 0.08)",
+														}}
+													>
+														<IconRobot size={16} color="white" />
+													</Avatar>
+													<Paper
+														p="md"
+														radius="20px 20px 20px 4px"
+														style={{
+															background: "rgba(255, 255, 255, 0.95)",
+															border: "none",
+															backdropFilter: "blur(20px)",
+															boxShadow: "0 2px 12px rgba(0, 0, 0, 0.08)",
+															minWidth: "60px",
+														}}
+													>
+														<Box
+															style={{
+																display: "flex",
+																alignItems: "center",
+																gap: "4px",
+															}}
+														>
+															<Box className={styles.typingDot} />
+															<Box className={styles.typingDot} />
+															<Box className={styles.typingDot} />
+														</Box>
+													</Paper>
+												</Group>
+											</Box>
+										)}
+									</Box>
 								)}
 							</Box>
 						</Card>
 
 						{/* Input Area */}
 						<Card
-							shadow="xl"
 							padding="lg"
 							radius="xl"
 							style={{
-								background: "rgba(255, 255, 255, 0.95)",
+								background:
+									"linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 242, 255, 0.9) 100%)",
 								backdropFilter: "blur(20px)",
-								border: "1px solid rgba(255, 255, 255, 0.2)",
+								border: "none",
+								boxShadow:
+									"0 4px 20px rgba(102, 126, 234, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)",
 							}}
 						>
 							<QuestionInput onSend={handleSendMessage} disabled={isLoading} />
