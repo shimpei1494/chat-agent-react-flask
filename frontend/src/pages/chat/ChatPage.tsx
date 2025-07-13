@@ -114,9 +114,12 @@ function ChatPage() {
 	return (
 		<Box
 			h="100vh"
+			w="100vw"
 			style={{
 				background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-				position: "relative",
+				position: "fixed",
+				top: 0,
+				left: 0,
 				overflow: "hidden",
 			}}
 		>
