@@ -1,11 +1,17 @@
 import { useCallback, useState } from 'react';
 import { ChatApiError, chatApi } from '../api/chatApi';
 import type { ChatSettings, Message } from '../types/chat';
+import { useChatStream } from './useChatStream';
 
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [typingIndicator, setTypingIndicator] = useState(false);
+  const [useStreaming, setUseStreaming] = useState(true);
+  const { streamState, sendMessageStream, resetStream } = useChatStream();
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(
+    null,
+  );
 
   const sendMessage = useCallback(
     async (content: string, settings: ChatSettings) => {
@@ -19,24 +25,57 @@ export function useChat() {
       setMessages((prev) => [...prev, userMessage]);
       setIsLoading(true);
       setTypingIndicator(true);
+      resetStream();
+
+      // Create placeholder message for streaming
+      const assistantMessageId = crypto.randomUUID();
+      setStreamingMessageId(assistantMessageId);
+
+      const placeholderMessage: Message = {
+        id: assistantMessageId,
+        content: '',
+        role: 'assistant',
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, placeholderMessage]);
 
       try {
-        const response = await chatApi.sendMessage({
-          message: content,
-          history: messages,
-          model: settings.model,
-          system_prompt: settings.systemPrompt,
-          temperature: settings.temperature,
-        });
+        if (useStreaming) {
+          const fullResponse = await sendMessageStream({
+            message: content,
+            history: messages,
+            model: settings.model,
+            system_prompt: settings.systemPrompt,
+            temperature: settings.temperature,
+          });
 
-        const assistantMessage: Message = {
-          id: crypto.randomUUID(),
-          content: response.response,
-          role: 'assistant',
-          timestamp: Date.now(),
-        };
+          // Update final message with complete response
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId
+                ? { ...msg, content: fullResponse }
+                : msg,
+            ),
+          );
+        } else {
+          // Fallback to non-streaming
+          const response = await chatApi.sendMessage({
+            message: content,
+            history: messages,
+            model: settings.model,
+            system_prompt: settings.systemPrompt,
+            temperature: settings.temperature,
+          });
 
-        setMessages((prev) => [...prev, assistantMessage]);
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === assistantMessageId
+                ? { ...msg, content: response.response }
+                : msg,
+            ),
+          );
+        }
+
         setTypingIndicator(false);
       } catch (error) {
         console.error('Error:', error);
@@ -50,20 +89,21 @@ export function useChat() {
           }
         }
 
-        const errorMessage: Message = {
-          id: crypto.randomUUID(),
-          content: errorContent,
-          role: 'assistant',
-          timestamp: Date.now(),
-        };
-        setMessages((prev) => [...prev, errorMessage]);
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMessageId
+              ? { ...msg, content: errorContent }
+              : msg,
+          ),
+        );
         setTypingIndicator(false);
       } finally {
         setIsLoading(false);
         setTypingIndicator(false);
+        setStreamingMessageId(null);
       }
     },
-    [messages],
+    [messages, useStreaming, sendMessageStream, resetStream],
   );
 
   const clearMessages = useCallback(() => {
@@ -76,5 +116,9 @@ export function useChat() {
     typingIndicator,
     sendMessage,
     clearMessages,
+    streamState,
+    streamingMessageId,
+    useStreaming,
+    setUseStreaming,
   };
 }

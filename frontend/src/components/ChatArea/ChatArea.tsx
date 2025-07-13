@@ -11,16 +11,23 @@ import {
 } from '@mantine/core';
 import { IconRobot } from '@tabler/icons-react';
 import { memo } from 'react';
-import type { Message } from '../../types/chat';
+import type { Message, StreamState } from '../../types/chat';
 import Answer from '../Answer/Answer';
 import styles from './ChatArea.module.css';
 
 interface ChatAreaProps {
   messages: Message[];
   typingIndicator: boolean;
+  streamState?: StreamState;
+  streamingMessageId?: string | null;
 }
 
-function ChatArea({ messages, typingIndicator }: ChatAreaProps) {
+function ChatArea({
+  messages,
+  typingIndicator,
+  streamState,
+  streamingMessageId,
+}: ChatAreaProps) {
   const theme = useMantineTheme();
 
   return (
@@ -43,9 +50,21 @@ function ChatArea({ messages, typingIndicator }: ChatAreaProps) {
           <EmptyState />
         ) : (
           <Box>
-            {messages.map((message) => (
-              <Answer key={message.id} message={message} />
-            ))}
+            {messages.map((message) => {
+              const isStreaming =
+                streamingMessageId === message.id && streamState?.isStreaming;
+              const displayContent = isStreaming
+                ? streamState?.currentMessage || message.content
+                : message.content;
+
+              return (
+                <Answer
+                  key={message.id}
+                  message={{ ...message, content: displayContent }}
+                  isStreaming={isStreaming}
+                />
+              );
+            })}
             {typingIndicator && <TypingIndicator />}
           </Box>
         )}

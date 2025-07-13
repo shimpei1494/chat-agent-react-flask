@@ -7,9 +7,10 @@ import styles from './Answer.module.css';
 
 interface AnswerProps {
   message: Message;
+  isStreaming?: boolean;
 }
 
-function Answer({ message }: AnswerProps) {
+function Answer({ message, isStreaming = false }: AnswerProps) {
   const isUser = message.role === 'user';
   const [isVisible, setIsVisible] = useState(false);
 
@@ -104,9 +105,20 @@ function Answer({ message }: AnswerProps) {
                   color: 'var(--mantine-color-dark-7)',
                   fontSize: '14px',
                   lineHeight: 1.5,
+                  position: 'relative',
                 }}
               >
                 <ReactMarkdown>{message.content}</ReactMarkdown>
+                {isStreaming && (
+                  <Box
+                    component="span"
+                    style={{
+                      borderRight: '2px solid #667eea',
+                      animation: 'blink 1s step-start infinite',
+                      marginLeft: '2px',
+                    }}
+                  />
+                )}
               </Box>
             )}
 
