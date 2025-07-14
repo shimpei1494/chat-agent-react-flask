@@ -13,7 +13,7 @@ if (!root) throw new Error('Root element not found');
 createRoot(root).render(
   <StrictMode>
     <BrowserRouter>
-      <MantineProvider theme={theme}>
+      <MantineProvider theme={theme} forceColorScheme="light">
         <App />
       </MantineProvider>
     </BrowserRouter>
