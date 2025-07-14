@@ -71,8 +71,8 @@ function Answer({ message, isStreaming = false }: AnswerProps) {
         >
           {/* Message content */}
           <Box>
-            {/* Label - Only show for AI */}
-            {!isUser && (
+            {/* Label - Only show for AI when not streaming */}
+            {!isUser && !isStreaming && (
               <Text
                 size="xs"
                 c="dimmed"

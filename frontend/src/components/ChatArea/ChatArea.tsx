@@ -136,16 +136,27 @@ function TypingIndicator() {
             minWidth: '60px',
           }}
         >
-          <Box
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: theme.other.spacing.xs,
-            }}
-          >
-            <Box className={styles.typingDot} />
-            <Box className={styles.typingDot} />
-            <Box className={styles.typingDot} />
+          <Box>
+            <Text
+              size="xs"
+              c="dimmed"
+              mb={4}
+              fw={500}
+              style={{ opacity: 0.8 }}
+            >
+              AI アシスタント
+            </Text>
+            <Box
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: theme.other.spacing.xs,
+              }}
+            >
+              <Box className={styles.typingDot} />
+              <Box className={styles.typingDot} />
+              <Box className={styles.typingDot} />
+            </Box>
           </Box>
         </Paper>
       </Group>
