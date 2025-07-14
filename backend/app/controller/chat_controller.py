@@ -1,6 +1,7 @@
-from flask import Blueprint, jsonify, request, Response, stream_template
-from pydantic import ValidationError
 import json
+
+from flask import Blueprint, Response, jsonify, request
+from pydantic import ValidationError
 
 from app.service.chat_service import ChatService
 from app.types.chat_types import ChatRequest

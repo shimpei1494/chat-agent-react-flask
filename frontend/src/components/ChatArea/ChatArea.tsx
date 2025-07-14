@@ -137,13 +137,7 @@ function TypingIndicator() {
           }}
         >
           <Box>
-            <Text
-              size="xs"
-              c="dimmed"
-              mb={4}
-              fw={500}
-              style={{ opacity: 0.8 }}
-            >
+            <Text size="xs" c="dimmed" mb={4} fw={500} style={{ opacity: 0.8 }}>
               AI アシスタント
             </Text>
             <Box
