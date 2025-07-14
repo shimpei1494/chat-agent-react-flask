@@ -1,120 +1,101 @@
-import { Container, Stack } from '@mantine/core';
-import { useState } from 'react';
-import Answer from '../../components/Answer/Answer';
-import ClearChatButton from '../../components/ClearChatButton/ClearChatButton';
-import QuestionInput from '../../components/QuestionInput/QuestionInput';
-import SettingsButton from '../../components/SettingsButton/SettingsButton';
-
-interface Message {
-  id: string;
-  content: string;
-  role: 'user' | 'assistant';
-  timestamp: number;
-}
-
-interface ChatSettings {
-  model: string;
-  systemPrompt: string;
-  temperature: number;
-}
+import { Box, Flex, useMantineTheme } from '@mantine/core';
+import { useCallback } from 'react';
+import ChatArea from '../../components/ChatArea/ChatArea';
+import ChatHistory from '../../components/ChatHistory/ChatHistory';
+import HeaderSection from '../../components/HeaderSection/HeaderSection';
+import InputSection from '../../components/InputSection/InputSection';
+import { useChat } from '../../hooks/useChat';
+import { useSettings } from '../../hooks/useSettings';
+import { useSidebar } from '../../hooks/useSidebar';
 
 function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [settings, setSettings] = useState<ChatSettings>({
-    model: 'gpt-4o-mini',
-    systemPrompt: 'You are a helpful AI assistant.',
-    temperature: 0.7,
-  });
+  const {
+    messages,
+    isLoading,
+    typingIndicator,
+    sendMessage,
+    clearMessages,
+    streamState,
+    streamingMessageId,
+  } = useChat();
+  const { settings, setSettings } = useSettings();
+  const { isSidebarCollapsed, toggleSidebar } = useSidebar();
+  const theme = useMantineTheme();
 
-  const handleSendMessage = async (content: string) => {
-    const userMessage: Message = {
-      id: crypto.randomUUID(),
-      content,
-      role: 'user',
-      timestamp: Date.now(),
-    };
+  const handleSendMessage = useCallback(
+    (content: string) => {
+      sendMessage(content, settings);
+    },
+    [sendMessage, settings],
+  );
 
-    setMessages((prev) => [...prev, userMessage]);
-    setIsLoading(true);
+  const handleClearChat = useCallback(() => {
+    clearMessages();
+  }, [clearMessages]);
 
-    try {
-      const response = await fetch('/api/v1/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: content,
-          history: messages,
-          model: settings.model,
-          system_prompt: settings.systemPrompt,
-          temperature: settings.temperature,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-
-      const data = await response.json();
-      const assistantMessage: Message = {
-        id: crypto.randomUUID(),
-        content: data.response,
-        role: 'assistant',
-        timestamp: Date.now(),
-      };
-
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Error:', error);
-      const errorMessage: Message = {
-        id: crypto.randomUUID(),
-        content: 'Sorry, there was an error processing your request.',
-        role: 'assistant',
-        timestamp: Date.now(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleClearChat = () => {
-    setMessages([]);
-  };
+  const handleNewChat = useCallback(() => {
+    clearMessages();
+  }, [clearMessages]);
 
   return (
-    <Container size="lg" h="100vh">
-      <Stack h="100%" gap="md">
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <h1>AI Chat Agent</h1>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <SettingsButton
+    <Box
+      h="100vh"
+      w="100vw"
+      style={{
+        background: theme.other.gradients.background,
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        overflow: 'hidden',
+      }}
+    >
+      {/* Background pattern overlay */}
+      <Box
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: theme.other.gradients.backgroundPattern,
+        }}
+      />
+
+      {/* Main layout with sidebar */}
+      <Flex h="100%" style={{ position: 'relative', zIndex: 1 }}>
+        {/* Left Sidebar */}
+        <Box p="md" style={{ flexShrink: 0 }}>
+          <ChatHistory
+            isCollapsed={isSidebarCollapsed}
+            onToggle={toggleSidebar}
+            onNewChat={handleNewChat}
+          />
+        </Box>
+
+        {/* Main Content Area */}
+        <Box flex={1} p="md" pl={0}>
+          <Flex direction="column" h="100%" gap="md">
+            {/* Header */}
+            <HeaderSection
               settings={settings}
               onSettingsChange={setSettings}
+              onClearChat={handleClearChat}
             />
-            <ClearChatButton onClear={handleClearChat} />
-          </div>
-        </div>
 
-        <div style={{ flex: 1, overflow: 'auto' }}>
-          <Stack gap="md">
-            {messages.map((message) => (
-              <Answer key={message.id} message={message} />
-            ))}
-          </Stack>
-        </div>
+            {/* Chat Area */}
+            <ChatArea
+              messages={messages}
+              typingIndicator={typingIndicator}
+              streamState={streamState}
+              streamingMessageId={streamingMessageId}
+            />
 
-        <QuestionInput onSend={handleSendMessage} disabled={isLoading} />
-      </Stack>
-    </Container>
+            {/* Input Area */}
+            <InputSection onSend={handleSendMessage} disabled={isLoading} />
+          </Flex>
+        </Box>
+      </Flex>
+    </Box>
   );
 }
 

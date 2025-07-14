@@ -82,7 +82,6 @@ chat-agent-react-flask/
 - **Frontend formatting**: `npm run format`
 - **Backend linting**: `uv run ruff check`
 - **Backend formatting**: `uv run ruff format`
-- **Type checking**: `uv run mypy app/`
 
 ## Environment Variables
 

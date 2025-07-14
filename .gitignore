@@ -29,7 +29,7 @@ wheels/
 .env.production.local
 
 # IDE and editor files
-.vscode/
+# .vscode/
 .idea/
 *.swp
 *.swo
@@ -166,6 +166,9 @@ dist/
 test-results/
 playwright-report/
 playwright/.cache/
+
+# TypeScript
+*.tsbuildinfo
 
 .claude/settings.local.json
 .mcp.json
