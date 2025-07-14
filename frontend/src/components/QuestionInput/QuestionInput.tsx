@@ -57,12 +57,13 @@ function QuestionInput({ onSend, disabled = false }: QuestionInputProps) {
               padding: '12px 16px',
               fontSize: '14px',
               resize: 'none',
+              color: 'var(--mantine-color-dark-9)',
               '&:focus': {
                 outline: 'none',
                 boxShadow: 'none',
               },
               '&::placeholder': {
-                color: 'rgba(102, 126, 234, 0.5)',
+                color: 'rgba(102, 126, 234, 0.6)',
                 fontWeight: 400,
               },
             },

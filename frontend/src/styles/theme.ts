@@ -62,10 +62,27 @@ export const theme = createTheme({
       defaultProps: {
         radius: 'md',
       },
+      styles: {
+        input: {
+          color: 'var(--mantine-color-dark-9)',
+        },
+      },
     },
     Textarea: {
       defaultProps: {
         radius: 'md',
+      },
+      styles: {
+        input: {
+          color: 'var(--mantine-color-dark-9)',
+        },
+      },
+    },
+    Text: {
+      styles: {
+        root: {
+          color: 'var(--mantine-color-dark-8)',
+        },
       },
     },
   },
