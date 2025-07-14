@@ -69,10 +69,6 @@ format-backend:
 	@echo "バックエンドのフォーマット実行中..."
 	cd backend && uv run ruff format
 
-# 型チェック（バックエンドのみ）
-typecheck:
-	@echo "バックエンドの型チェック実行中..."
-	cd backend && uv run mypy app/
 
 # クリーンアップ
 clean:

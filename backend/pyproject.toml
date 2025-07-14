@@ -16,7 +16,6 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "ruff>=0.6.0",
-    "mypy>=1.11.0",
 ]
 
 [build-system]
@@ -35,11 +34,6 @@ fixable = ["ALL"]
 quote-style = "double"
 indent-style = "space"
 
-[tool.mypy]
-python_version = "3.11"
-strict = true
-warn_return_any = true
-warn_unused_configs = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["app"]
