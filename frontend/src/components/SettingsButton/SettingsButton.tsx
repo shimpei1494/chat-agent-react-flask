@@ -1,12 +1,4 @@
-import {
-  Button,
-  Modal,
-  Select,
-  Slider,
-  Stack,
-  Text,
-  Textarea,
-} from '@mantine/core';
+import { Button, Modal, Select, Slider, Stack, Text, Textarea } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import { useState } from 'react';
 
@@ -156,9 +148,7 @@ function SettingsButton({ settings, onSettingsChange }: SettingsButtonProps) {
             </Text>
             <Slider
               value={localSettings.temperature}
-              onChange={(value) =>
-                setLocalSettings({ ...localSettings, temperature: value })
-              }
+              onChange={(value) => setLocalSettings({ ...localSettings, temperature: value })}
               min={0}
               max={1}
               step={0.1}
@@ -179,9 +169,7 @@ function SettingsButton({ settings, onSettingsChange }: SettingsButtonProps) {
             />
           </div>
 
-          <div
-            style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}
-          >
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
             <Button
               variant="outline"
               onClick={handleCancel}

@@ -9,9 +9,7 @@ export function useChat() {
   const [typingIndicator, setTypingIndicator] = useState(false);
   const [useStreaming, setUseStreaming] = useState(true);
   const { streamState, sendMessageStream, resetStream } = useChatStream();
-  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(
-    null,
-  );
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
 
   const sendMessage = useCallback(
     async (content: string, settings: ChatSettings) => {
@@ -52,9 +50,7 @@ export function useChat() {
           // Update final message with complete response
           setMessages((prev) =>
             prev.map((msg) =>
-              msg.id === assistantMessageId
-                ? { ...msg, content: fullResponse }
-                : msg,
+              msg.id === assistantMessageId ? { ...msg, content: fullResponse } : msg,
             ),
           );
         } else {
@@ -69,9 +65,7 @@ export function useChat() {
 
           setMessages((prev) =>
             prev.map((msg) =>
-              msg.id === assistantMessageId
-                ? { ...msg, content: response.response }
-                : msg,
+              msg.id === assistantMessageId ? { ...msg, content: response.response } : msg,
             ),
           );
         }
@@ -91,9 +85,7 @@ export function useChat() {
 
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === assistantMessageId
-              ? { ...msg, content: errorContent }
-              : msg,
+            msg.id === assistantMessageId ? { ...msg, content: errorContent } : msg,
           ),
         );
         setTypingIndicator(false);

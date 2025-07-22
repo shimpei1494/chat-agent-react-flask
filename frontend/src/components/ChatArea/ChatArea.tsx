@@ -1,14 +1,4 @@
-import {
-  Avatar,
-  Box,
-  Card,
-  Flex,
-  Group,
-  Paper,
-  Text,
-  Title,
-  useMantineTheme,
-} from '@mantine/core';
+import { Avatar, Box, Card, Flex, Group, Paper, Text, Title, useMantineTheme } from '@mantine/core';
 import { IconRobot } from '@tabler/icons-react';
 import { memo } from 'react';
 import type { Message, StreamState } from '../../types/chat';
@@ -22,12 +12,7 @@ interface ChatAreaProps {
   streamingMessageId?: string | null;
 }
 
-function ChatArea({
-  messages,
-  typingIndicator,
-  streamState,
-  streamingMessageId,
-}: ChatAreaProps) {
+function ChatArea({ messages, typingIndicator, streamState, streamingMessageId }: ChatAreaProps) {
   const theme = useMantineTheme();
 
   return (
@@ -51,8 +36,7 @@ function ChatArea({
         ) : (
           <Box>
             {messages.map((message) => {
-              const isStreaming =
-                streamingMessageId === message.id && streamState?.isStreaming;
+              const isStreaming = streamingMessageId === message.id && streamState?.isStreaming;
               const displayContent = isStreaming
                 ? streamState?.currentMessage || message.content
                 : message.content;

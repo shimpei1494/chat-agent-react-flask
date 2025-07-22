@@ -103,10 +103,8 @@ export const theme = createTheme({
 
     // ガラスモーフィズム効果
     glass: {
-      white:
-        'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 242, 255, 0.9) 100%)',
-      light:
-        'linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 255, 0.8) 100%)',
+      white: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 242, 255, 0.9) 100%)',
+      light: 'linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(248, 250, 255, 0.8) 100%)',
       subtle: 'rgba(255, 255, 255, 0.7)',
     },
 
@@ -118,14 +116,11 @@ export const theme = createTheme({
     // カスタムシャドウ
     shadows: {
       card: '0 4px 20px rgba(102, 126, 234, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)',
-      cardLight:
-        '0 4px 20px rgba(102, 126, 234, 0.06), 0 1px 3px rgba(0, 0, 0, 0.05)',
+      cardLight: '0 4px 20px rgba(102, 126, 234, 0.06), 0 1px 3px rgba(0, 0, 0, 0.05)',
       avatar: '0 3px 12px rgba(0, 0, 0, 0.08)',
       button: '0 3px 12px rgba(102, 126, 234, 0.3)',
-      userMessage:
-        '0 4px 20px rgba(102, 126, 234, 0.25), 0 2px 8px rgba(0, 0, 0, 0.05)',
-      aiMessage:
-        '0 2px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05)',
+      userMessage: '0 4px 20px rgba(102, 126, 234, 0.25), 0 2px 8px rgba(0, 0, 0, 0.05)',
+      aiMessage: '0 2px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05)',
       icon: '0 20px 40px rgba(102, 126, 234, 0.3)',
     },
 
