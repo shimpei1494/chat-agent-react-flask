@@ -6,13 +6,17 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false,
+    "ignoreUnknown": true,
     "includes": [
       "frontend/**/*.ts",
       "frontend/**/*.tsx",
       "frontend/**/*.js",
       "frontend/**/*.jsx",
-      "frontend/**/*.json"
+      "frontend/**/*.json",
+      "frontend/**/*.css",
+      "frontend/**/*.html",
+      "!frontend/dist/**/*",
+      "!frontend/node_modules/**/*"
     ]
   },
   "linter": {
@@ -46,6 +50,14 @@
       "indentStyle": "space",
       "indentWidth": 2,
       "trailingCommas": "none"
+    }
+  },
+  "css": {
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "quoteStyle": "double"
     }
   }
 }
