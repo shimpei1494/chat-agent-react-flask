@@ -110,8 +110,7 @@ function ChatHistory({
           'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 242, 255, 0.9) 100%)',
         backdropFilter: 'blur(20px)',
         border: 'none',
-        boxShadow:
-          '0 4px 20px rgba(102, 126, 234, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)',
+        boxShadow: '0 4px 20px rgba(102, 126, 234, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)',
         width: isCollapsed ? '80px' : '350px',
         transition: 'all 0.3s ease',
         position: 'relative',
@@ -121,20 +120,11 @@ function ChatHistory({
         {/* Header with toggle and new chat */}
         <Flex justify="space-between" align="center" h="40px">
           {!isCollapsed && (
-            <Text
-              fw={600}
-              size="lg"
-              c="dimmed"
-              style={{ whiteSpace: 'nowrap' }}
-            >
+            <Text fw={600} size="lg" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
               チャット履歴
             </Text>
           )}
-          <Flex
-            align="center"
-            gap="xs"
-            style={{ marginLeft: isCollapsed ? 0 : 'auto' }}
-          >
+          <Flex align="center" gap="xs" style={{ marginLeft: isCollapsed ? 0 : 'auto' }}>
             {!isCollapsed && (
               <Button
                 size="sm"
@@ -142,8 +132,7 @@ function ChatHistory({
                 leftSection={<IconPlus size={16} />}
                 onClick={onNewChat}
                 style={{
-                  background:
-                    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   border: 'none',
                   boxShadow: '0 2px 10px rgba(102, 126, 234, 0.3)',
                 }}
@@ -173,11 +162,7 @@ function ChatHistory({
                 zIndex: 10,
               }}
             >
-              {isCollapsed ? (
-                <IconChevronRight size={16} />
-              ) : (
-                <IconChevronLeft size={16} />
-              )}
+              {isCollapsed ? <IconChevronRight size={16} /> : <IconChevronLeft size={16} />}
             </ActionIcon>
           </Flex>
         </Flex>

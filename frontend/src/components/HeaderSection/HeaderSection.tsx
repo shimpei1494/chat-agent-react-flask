@@ -1,12 +1,4 @@
-import {
-  Box,
-  Card,
-  Flex,
-  Group,
-  Text,
-  Title,
-  useMantineTheme,
-} from '@mantine/core';
+import { Box, Card, Flex, Group, Text, Title, useMantineTheme } from '@mantine/core';
 import { memo } from 'react';
 import type { ChatSettings } from '../../types/chat';
 import ClearChatButton from '../ClearChatButton/ClearChatButton';
@@ -18,11 +10,7 @@ interface HeaderSectionProps {
   onClearChat: () => void;
 }
 
-function HeaderSection({
-  settings,
-  onSettingsChange,
-  onClearChat,
-}: HeaderSectionProps) {
+function HeaderSection({ settings, onSettingsChange, onClearChat }: HeaderSectionProps) {
   const theme = useMantineTheme();
 
   return (
@@ -44,10 +32,7 @@ function HeaderSection({
           </Text>
         </Box>
         <Group gap="xs">
-          <SettingsButton
-            settings={settings}
-            onSettingsChange={onSettingsChange}
-          />
+          <SettingsButton settings={settings} onSettingsChange={onSettingsChange} />
           <ClearChatButton onClear={onClearChat} />
         </Group>
       </Flex>
