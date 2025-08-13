@@ -9,15 +9,7 @@ import { useSettings } from '../../hooks/useSettings';
 import { useSidebar } from '../../hooks/useSidebar';
 
 function ChatPage() {
-  const {
-    messages,
-    isLoading,
-    typingIndicator,
-    sendMessage,
-    clearMessages,
-    streamState,
-    streamingMessageId,
-  } = useChat();
+  const { messages, isLoading, typingIndicator, sendMessage, clearMessages } = useChat();
   const { settings, setSettings } = useSettings();
   const { isSidebarCollapsed, toggleSidebar } = useSidebar();
   const theme = useMantineTheme();
@@ -83,12 +75,7 @@ function ChatPage() {
             />
 
             {/* Chat Area */}
-            <ChatArea
-              messages={messages}
-              typingIndicator={typingIndicator}
-              streamState={streamState}
-              streamingMessageId={streamingMessageId}
-            />
+            <ChatArea messages={messages} typingIndicator={typingIndicator} />
 
             {/* Input Area */}
             <InputSection onSend={handleSendMessage} disabled={isLoading} />
