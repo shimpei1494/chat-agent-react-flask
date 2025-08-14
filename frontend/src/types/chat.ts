@@ -1,3 +1,12 @@
+
+export interface ChatSettings {
+  model: string;
+  systemPrompt: string;
+  temperature: number;
+  provider: 'direct' | 'ai-sdk'; // 実装プロバイダーの選択
+}
+
+// 互換性のためのレガシー型（段階的に削除予定）
 export interface Message {
   id: string;
   content: string;
@@ -5,12 +14,7 @@ export interface Message {
   timestamp: number;
 }
 
-export interface ChatSettings {
-  model: string;
-  systemPrompt: string;
-  temperature: number;
-}
-
+// バックエンド通信用（Flask API用）
 export interface ChatRequest {
   message: string;
   history: Message[];
@@ -23,6 +27,7 @@ export interface ChatResponse {
   response: string;
 }
 
+// 旧実装で使用されていた型（削除予定）
 export interface StreamChunk {
   type: 'data' | 'error' | 'complete';
   data?: string;

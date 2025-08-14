@@ -1,12 +1,7 @@
 import { Button, Modal, Select, Slider, Stack, Text, Textarea } from '@mantine/core';
 import { IconSettings } from '@tabler/icons-react';
 import { useState } from 'react';
-
-interface ChatSettings {
-  model: string;
-  systemPrompt: string;
-  temperature: number;
-}
+import type { ChatSettings } from '../../types/chat';
 
 interface SettingsButtonProps {
   settings: ChatSettings;
@@ -18,6 +13,11 @@ const MODEL_OPTIONS = [
   { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
   { value: 'gpt-4o', label: 'GPT-4o' },
   { value: 'gemini', label: 'Gemini' },
+];
+
+const PROVIDER_OPTIONS = [
+  { value: 'direct', label: 'Direct Implementation (Stable)' },
+  { value: 'ai-sdk', label: 'AI SDK (Beta - Advanced Features)' },
 ];
 
 function SettingsButton({ settings, onSettingsChange }: SettingsButtonProps) {
@@ -96,6 +96,35 @@ function SettingsButton({ settings, onSettingsChange }: SettingsButtonProps) {
               setLocalSettings({
                 ...localSettings,
                 model: value || 'gpt-4o-mini',
+              })
+            }
+            styles={{
+              input: {
+                '&:focus': {
+                  borderColor: '#667eea',
+                },
+              },
+              option: {
+                '&:hover': {
+                  background: 'rgba(102, 126, 234, 0.08)',
+                },
+                '&[data-selected]': {
+                  background: 'rgba(102, 126, 234, 0.1)',
+                  color: '#667eea',
+                },
+              },
+            }}
+          />
+
+          <Select
+            label="Implementation Provider"
+            description="Choose between stable direct implementation or beta AI SDK"
+            data={PROVIDER_OPTIONS}
+            value={localSettings.provider}
+            onChange={(value) =>
+              setLocalSettings({
+                ...localSettings,
+                provider: (value as 'direct' | 'ai-sdk') || 'direct',
               })
             }
             styles={{

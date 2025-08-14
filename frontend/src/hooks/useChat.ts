@@ -1,49 +1,127 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useState } from 'react';
 import type { ChatSettings, Message } from '../types/chat';
-import { useAiChat } from './useAiChat';
 
 export function useChat() {
-  const aiChat = useAiChat();
-
-  // Vercel AI SDKのメッセージを既存のMessage型に変換
-  const messages: Message[] = useMemo(() => {
-    return aiChat.messages.map((msg, index) => ({
-      id: `msg-${index}`, // AI SDKにはIDがないので生成
-      content: msg.content,
-      role: msg.role as 'user' | 'assistant',
-      timestamp: Date.now() - (aiChat.messages.length - index) * 1000, // 推定タイムスタンプ
-    }));
-  }, [aiChat.messages]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const sendMessage = useCallback(
     async (content: string, settings: ChatSettings) => {
+      if (isLoading) return;
+      
+      setIsLoading(true);
+      
       try {
-        await aiChat.sendMessage(content, settings);
+        // ユーザーメッセージをすぐに追加
+        const userMessage: Message = {
+          id: `user-${Date.now()}`,
+          content,
+          role: 'user',
+          timestamp: Date.now(),
+        };
+        
+        setMessages(prev => [...prev, userMessage]);
+
+        // AIレスポンス用の空メッセージを作成
+        const aiMessageId = `ai-${Date.now()}`;
+        const aiMessage: Message = {
+          id: aiMessageId,
+          content: '',
+          role: 'assistant',
+          timestamp: Date.now(),
+        };
+        
+        setMessages(prev => [...prev, aiMessage]);
+
+        // 新しいAPI形式でリクエスト
+        const requestMessages = [
+          ...messages.map(msg => ({ role: msg.role, content: msg.content })),
+          { role: 'user' as const, content }
+        ];
+
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: requestMessages,
+            model: settings.model,
+            system_prompt: settings.systemPrompt,
+            temperature: settings.temperature,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error('No response body');
+
+        const decoder = new TextDecoder();
+        let fullContent = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('0:"')) {
+              // AI SDK v2.0.12形式のデータチャンク
+              const data = line.slice(3, -1); // '0:"' と '"' を除去
+              fullContent += data.replace(/\\"/g, '"').replace(/\\n/g, '\n');
+              
+              // リアルタイム更新
+              setMessages(prev => 
+                prev.map(msg => 
+                  msg.id === aiMessageId 
+                    ? { ...msg, content: fullContent }
+                    : msg
+                )
+              );
+            } else if (line.startsWith('d:')) {
+              // 完了シグナル
+              break;
+            }
+          }
+        }
+
       } catch (error) {
         console.error('Error sending message:', error);
+        // エラー時は最後のassistantメッセージを削除
+        setMessages(prev => {
+          for (let i = prev.length - 1; i >= 0; i--) {
+            if (prev[i].role === 'assistant') {
+              return prev.filter((_, index) => index !== i);
+            }
+          }
+          return prev;
+        });
+      } finally {
+        setIsLoading(false);
       }
     },
-    [aiChat],
+    [messages, isLoading],
   );
 
   const clearMessages = useCallback(() => {
-    aiChat.clearMessages();
-  }, [aiChat]);
+    setMessages([]);
+  }, []);
 
-  // 互換性のためのダミー関数
   const toggleStreaming = useCallback(() => {
-    console.log('Streaming is always enabled with Vercel AI SDK');
+    console.log('Streaming is always enabled');
   }, []);
 
   return {
     messages,
     sendMessage,
     clearMessages,
-    isLoading: aiChat.isLoading,
-    typingIndicator: aiChat.isLoading,
-    useStreaming: true, // AI SDKは常にストリーミング
+    isLoading,
+    typingIndicator: isLoading,
+    useStreaming: true,
     toggleStreaming,
-    // AI SDK固有のプロパティは省略（streamState, streamingMessageIdは不要）
     streamState: undefined,
     streamingMessageId: null,
   };

@@ -4,13 +4,16 @@ import ChatArea from '../../components/ChatArea/ChatArea';
 import ChatHistory from '../../components/ChatHistory/ChatHistory';
 import HeaderSection from '../../components/HeaderSection/HeaderSection';
 import InputSection from '../../components/InputSection/InputSection';
-import { useChat } from '../../hooks/useChat';
+import { useChatProvider } from '../../hooks/useChatProvider';
 import { useSettings } from '../../hooks/useSettings';
 import { useSidebar } from '../../hooks/useSidebar';
 
 function ChatPage() {
-  const { messages, isLoading, typingIndicator, sendMessage, clearMessages } = useChat();
   const { settings, setSettings } = useSettings();
+  const { messages, isLoading, typingIndicator, sendMessage, clearMessages } = useChatProvider({
+    provider: settings.provider,
+    settings
+  });
   const { isSidebarCollapsed, toggleSidebar } = useSidebar();
   const theme = useMantineTheme();
 
