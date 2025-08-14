@@ -1,4 +1,3 @@
-
 export interface ChatSettings {
   model: string;
   systemPrompt: string;

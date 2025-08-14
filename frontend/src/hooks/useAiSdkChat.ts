@@ -12,13 +12,10 @@ export function useAiSdkChat(_options: UseAiSdkChatOptions = {}) {
   const [isLoading] = useState(false);
   const [input, setInput] = useState('');
 
-  const sendMessage = useCallback(
-    async (_content: string, _messageSettings?: ChatSettings) => {
-      console.warn('AI SDK実装は開発中です。直接実装を使用してください。');
-      // 現在は何も行わない
-    },
-    [],
-  );
+  const sendMessage = useCallback(async (_content: string, _messageSettings?: ChatSettings) => {
+    console.warn('AI SDK実装は開発中です。直接実装を使用してください。');
+    // 現在は何も行わない
+  }, []);
 
   const clearMessages = useCallback(() => {
     setMessages([]);
@@ -28,13 +25,16 @@ export function useAiSdkChat(_options: UseAiSdkChatOptions = {}) {
     setInput(e.target.value);
   }, []);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    if (input.trim()) {
-      sendMessage(input.trim());
-      setInput('');
-    }
-  }, [input, sendMessage]);
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (input.trim()) {
+        sendMessage(input.trim());
+        setInput('');
+      }
+    },
+    [input, sendMessage],
+  );
 
   return {
     messages,

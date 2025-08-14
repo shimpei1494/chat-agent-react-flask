@@ -8,9 +8,9 @@ export function useChat() {
   const sendMessage = useCallback(
     async (content: string, settings: ChatSettings) => {
       if (isLoading) return;
-      
+
       setIsLoading(true);
-      
+
       try {
         // ユーザーメッセージをすぐに追加
         const userMessage: Message = {
@@ -19,8 +19,8 @@ export function useChat() {
           role: 'user',
           timestamp: Date.now(),
         };
-        
-        setMessages(prev => [...prev, userMessage]);
+
+        setMessages((prev) => [...prev, userMessage]);
 
         // AIレスポンス用の空メッセージを作成
         const aiMessageId = `ai-${Date.now()}`;
@@ -30,13 +30,13 @@ export function useChat() {
           role: 'assistant',
           timestamp: Date.now(),
         };
-        
-        setMessages(prev => [...prev, aiMessage]);
+
+        setMessages((prev) => [...prev, aiMessage]);
 
         // 新しいAPI形式でリクエスト
         const requestMessages = [
-          ...messages.map(msg => ({ role: msg.role, content: msg.content })),
-          { role: 'user' as const, content }
+          ...messages.map((msg) => ({ role: msg.role, content: msg.content })),
+          { role: 'user' as const, content },
         ];
 
         const response = await fetch('/api/chat', {
@@ -72,14 +72,12 @@ export function useChat() {
               // AI SDK v2.0.12形式のデータチャンク
               const data = line.slice(3, -1); // '0:"' と '"' を除去
               fullContent += data.replace(/\\"/g, '"').replace(/\\n/g, '\n');
-              
+
               // リアルタイム更新
-              setMessages(prev => 
-                prev.map(msg => 
-                  msg.id === aiMessageId 
-                    ? { ...msg, content: fullContent }
-                    : msg
-                )
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === aiMessageId ? { ...msg, content: fullContent } : msg,
+                ),
               );
             } else if (line.startsWith('d:')) {
               // 完了シグナル
@@ -87,11 +85,10 @@ export function useChat() {
             }
           }
         }
-
       } catch (error) {
         console.error('Error sending message:', error);
         // エラー時は最後のassistantメッセージを削除
-        setMessages(prev => {
+        setMessages((prev) => {
           for (let i = prev.length - 1; i >= 0; i--) {
             if (prev[i].role === 'assistant') {
               return prev.filter((_, index) => index !== i);

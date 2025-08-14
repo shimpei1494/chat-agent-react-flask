@@ -12,7 +12,7 @@ function ChatPage() {
   const { settings, setSettings } = useSettings();
   const { messages, isLoading, typingIndicator, sendMessage, clearMessages } = useChatProvider({
     provider: settings.provider,
-    settings
+    settings,
   });
   const { isSidebarCollapsed, toggleSidebar } = useSidebar();
   const theme = useMantineTheme();
