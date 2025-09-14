@@ -21,6 +21,7 @@
 			"source.organizeImports": "explicit"
 		}
 	},
+	"python.analysis.autoImportCompletions": true,
 
 	// JavaScript系ファイルの共通設定
 	"[javascript][typescript][javascriptreact][typescriptreact]": {
