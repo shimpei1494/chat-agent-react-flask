@@ -19,7 +19,7 @@ function QuestionInput({ onSend, disabled = false }: QuestionInputProps) {
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === 'Enter' && event.ctrlKey) {
       event.preventDefault();
       handleSubmit();
     }
@@ -39,7 +39,7 @@ function QuestionInput({ onSend, disabled = false }: QuestionInputProps) {
     >
       <Group align="flex-end" gap="xs">
         <Textarea
-          placeholder="メッセージを入力してください... (Enterで送信、Shift+Enterで改行)"
+          placeholder="メッセージを入力してください... (Ctrl+Enterで送信)"
           value={input}
           onChange={(event) => setInput(event.currentTarget.value)}
           onKeyDown={handleKeyDown}
@@ -72,9 +72,7 @@ function QuestionInput({ onSend, disabled = false }: QuestionInputProps) {
         />
         <Button
           className={`${styles.sendButton} ${
-            !input.trim() || disabled
-              ? styles.sendButtonDisabled
-              : styles.sendButtonEnabled
+            !input.trim() || disabled ? styles.sendButtonDisabled : styles.sendButtonEnabled
           } ${input.trim() && !disabled ? styles.sendButtonPulse : ''}`}
           onClick={handleSubmit}
           disabled={!input.trim() || disabled}
@@ -90,10 +88,7 @@ function QuestionInput({ onSend, disabled = false }: QuestionInputProps) {
             height: '40px',
             minWidth: '40px',
             padding: 0,
-            boxShadow:
-              !input.trim() || disabled
-                ? 'none'
-                : '0 3px 12px rgba(102, 126, 234, 0.3)',
+            boxShadow: !input.trim() || disabled ? 'none' : '0 3px 12px rgba(102, 126, 234, 0.3)',
           }}
         >
           <IconSend size={18} color="white" />

@@ -11,7 +11,6 @@
 
 	// Biome設定
 	"biome.lsp.bin": "frontend/node_modules/@biomejs/biome/bin/biome",
-	"biome.lsp.configPath": "frontend/biome.json",
 
 	// Python設定
 	"[python]": {
@@ -22,6 +21,7 @@
 			"source.organizeImports": "explicit"
 		}
 	},
+	"python.analysis.autoImportCompletions": true,
 
 	// JavaScript系ファイルの共通設定
 	"[javascript][typescript][javascriptreact][typescriptreact]": {

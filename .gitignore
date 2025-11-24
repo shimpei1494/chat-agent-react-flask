@@ -172,3 +172,4 @@ playwright/.cache/
 
 .claude/settings.local.json
 .mcp.json
+.serena/

@@ -1,33 +1,16 @@
-import {
-  Avatar,
-  Box,
-  Card,
-  Flex,
-  Group,
-  Paper,
-  Text,
-  Title,
-  useMantineTheme,
-} from '@mantine/core';
+import { Avatar, Box, Card, Flex, Group, Paper, Text, Title, useMantineTheme } from '@mantine/core';
 import { IconRobot } from '@tabler/icons-react';
 import { memo } from 'react';
-import type { Message, StreamState } from '../../types/chat';
+import type { Message } from '../../types/chat';
 import Answer from '../Answer/Answer';
 import styles from './ChatArea.module.css';
 
 interface ChatAreaProps {
   messages: Message[];
   typingIndicator: boolean;
-  streamState?: StreamState;
-  streamingMessageId?: string | null;
 }
 
-function ChatArea({
-  messages,
-  typingIndicator,
-  streamState,
-  streamingMessageId,
-}: ChatAreaProps) {
+function ChatArea({ messages, typingIndicator }: ChatAreaProps) {
   const theme = useMantineTheme();
 
   return (
@@ -50,21 +33,18 @@ function ChatArea({
           <EmptyState />
         ) : (
           <Box>
-            {messages.map((message) => {
-              const isStreaming =
-                streamingMessageId === message.id && streamState?.isStreaming;
-              const displayContent = isStreaming
-                ? streamState?.currentMessage || message.content
-                : message.content;
-
-              return (
-                <Answer
-                  key={message.id}
-                  message={{ ...message, content: displayContent }}
-                  isStreaming={isStreaming}
-                />
-              );
-            })}
+            {messages.map((message) => (
+              <Answer
+                key={message.id}
+                message={message}
+                // Vercel AI SDKでは最後のメッセージが自動的にストリーミング表示される
+                isStreaming={
+                  message.role === 'assistant' &&
+                  message === messages[messages.length - 1] &&
+                  typingIndicator
+                }
+              />
+            ))}
             {typingIndicator && <TypingIndicator />}
           </Box>
         )}

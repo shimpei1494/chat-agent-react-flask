@@ -12,7 +12,7 @@ export class ChatApiError extends Error {
 }
 
 export class ChatApi {
-  private baseUrl = '/api/v1';
+  private baseUrl = '/api';
 
   async sendMessage(request: ChatRequest): Promise<ChatResponse> {
     try {
@@ -44,7 +44,7 @@ export class ChatApi {
 
   async checkHealth(): Promise<{ status: string }> {
     try {
-      const response = await fetch(`${this.baseUrl}/health`);
+      const response = await fetch(`/api/health`);
       if (!response.ok) {
         throw new ChatApiError('Health check failed', response.status);
       }

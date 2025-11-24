@@ -1,124 +1,125 @@
 import { useCallback, useState } from 'react';
-import { ChatApiError, chatApi } from '../api/chatApi';
 import type { ChatSettings, Message } from '../types/chat';
-import { useChatStream } from './useChatStream';
 
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [typingIndicator, setTypingIndicator] = useState(false);
-  const [useStreaming, setUseStreaming] = useState(true);
-  const { streamState, sendMessageStream, resetStream } = useChatStream();
-  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(
-    null,
-  );
 
   const sendMessage = useCallback(
     async (content: string, settings: ChatSettings) => {
-      const userMessage: Message = {
-        id: crypto.randomUUID(),
-        content,
-        role: 'user',
-        timestamp: Date.now(),
-      };
+      if (isLoading) return;
 
-      setMessages((prev) => [...prev, userMessage]);
       setIsLoading(true);
-      setTypingIndicator(true);
-      resetStream();
-
-      // Create placeholder message for streaming
-      const assistantMessageId = crypto.randomUUID();
-      setStreamingMessageId(assistantMessageId);
-
-      const placeholderMessage: Message = {
-        id: assistantMessageId,
-        content: '',
-        role: 'assistant',
-        timestamp: Date.now(),
-      };
-      setMessages((prev) => [...prev, placeholderMessage]);
 
       try {
-        if (useStreaming) {
-          const fullResponse = await sendMessageStream({
-            message: content,
-            history: messages,
+        // ユーザーメッセージをすぐに追加
+        const userMessage: Message = {
+          id: `user-${Date.now()}`,
+          content,
+          role: 'user',
+          timestamp: Date.now(),
+        };
+
+        setMessages((prev) => [...prev, userMessage]);
+
+        // AIレスポンス用の空メッセージを作成
+        const aiMessageId = `ai-${Date.now()}`;
+        const aiMessage: Message = {
+          id: aiMessageId,
+          content: '',
+          role: 'assistant',
+          timestamp: Date.now(),
+        };
+
+        setMessages((prev) => [...prev, aiMessage]);
+
+        // 新しいAPI形式でリクエスト
+        const requestMessages = [
+          ...messages.map((msg) => ({ role: msg.role, content: msg.content })),
+          { role: 'user' as const, content },
+        ];
+
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: requestMessages,
             model: settings.model,
             system_prompt: settings.systemPrompt,
             temperature: settings.temperature,
-          });
+          }),
+        });
 
-          // Update final message with complete response
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantMessageId
-                ? { ...msg, content: fullResponse }
-                : msg,
-            ),
-          );
-        } else {
-          // Fallback to non-streaming
-          const response = await chatApi.sendMessage({
-            message: content,
-            history: messages,
-            model: settings.model,
-            system_prompt: settings.systemPrompt,
-            temperature: settings.temperature,
-          });
-
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantMessageId
-                ? { ...msg, content: response.response }
-                : msg,
-            ),
-          );
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
         }
 
-        setTypingIndicator(false);
-      } catch (error) {
-        console.error('Error:', error);
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error('No response body');
 
-        let errorContent = 'Sorry, there was an error processing your request.';
-        if (error instanceof ChatApiError) {
-          if (error.status === 429) {
-            errorContent = 'Too many requests. Please try again later.';
-          } else if (error.status === 500) {
-            errorContent = 'Server error occurred. Please try again.';
+        const decoder = new TextDecoder();
+        let fullContent = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('0:"')) {
+              // AI SDK v2.0.12形式のデータチャンク
+              const data = line.slice(3, -1); // '0:"' と '"' を除去
+              fullContent += data.replace(/\\"/g, '"').replace(/\\n/g, '\n');
+
+              // リアルタイム更新
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === aiMessageId ? { ...msg, content: fullContent } : msg,
+                ),
+              );
+            } else if (line.startsWith('d:')) {
+              // 完了シグナル
+              break;
+            }
           }
         }
-
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === assistantMessageId
-              ? { ...msg, content: errorContent }
-              : msg,
-          ),
-        );
-        setTypingIndicator(false);
+      } catch (error) {
+        console.error('Error sending message:', error);
+        // エラー時は最後のassistantメッセージを削除
+        setMessages((prev) => {
+          for (let i = prev.length - 1; i >= 0; i--) {
+            if (prev[i].role === 'assistant') {
+              return prev.filter((_, index) => index !== i);
+            }
+          }
+          return prev;
+        });
       } finally {
         setIsLoading(false);
-        setTypingIndicator(false);
-        setStreamingMessageId(null);
       }
     },
-    [messages, useStreaming, sendMessageStream, resetStream],
+    [messages, isLoading],
   );
 
   const clearMessages = useCallback(() => {
     setMessages([]);
   }, []);
 
+  const toggleStreaming = useCallback(() => {
+    console.log('Streaming is always enabled');
+  }, []);
+
   return {
     messages,
-    isLoading,
-    typingIndicator,
     sendMessage,
     clearMessages,
-    streamState,
-    streamingMessageId,
-    useStreaming,
-    setUseStreaming,
+    isLoading,
+    typingIndicator: isLoading,
+    useStreaming: true,
+    toggleStreaming,
+    streamState: undefined,
+    streamingMessageId: null,
   };
 }

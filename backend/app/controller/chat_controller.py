@@ -1,4 +1,5 @@
-import json
+import time
+from typing import Any
 
 from flask import Blueprint, Response, jsonify, request
 from pydantic import ValidationError
@@ -12,44 +13,64 @@ chat_service = ChatService()
 
 @chat_bp.route("/chat", methods=["POST"])
 def chat():
+    """AI SDK標準エンドポイント /api/chat"""
     try:
         data = request.get_json()
         if not data:
             return jsonify({"error": "No JSON data provided"}), 400
 
-        chat_request = ChatRequest(**data)
-        response = chat_service.process_chat(chat_request)
+        # AI SDK形式: { messages: [UIMessage] } を処理
+        messages = data.get("messages", [])
+        if not messages:
+            return jsonify({"error": "No messages provided"}), 400
 
-        return jsonify(response.model_dump())
+        # 最後のユーザーメッセージを取得
+        user_messages = [msg for msg in messages if msg.get("role") == "user"]
+        if not user_messages:
+            return jsonify({"error": "No user message found"}), 400
 
-    except ValidationError as e:
-        return jsonify({"error": "Invalid request data", "details": e.errors()}), 400
+        # 最新のユーザーメッセージから内容を抽出
+        last_user_msg = user_messages[-1]
+        message_content = last_user_msg.get("content", "")
 
-    except Exception as e:
-        return jsonify({"error": "Internal server error", "message": str(e)}), 500
+        # メッセージ履歴を構築
+        history = build_message_history(messages[:-1])
 
+        # 設定値（将来的にはリクエストから取得）
+        model = data.get("model", "gpt-4o-mini")
+        system_prompt = data.get("system_prompt", "You are a helpful AI assistant.")
+        temperature = data.get("temperature", 0.7)
 
-@chat_bp.route("/chat/stream", methods=["POST"])
-def chat_stream():
-    try:
-        data = request.get_json()
-        if not data:
-            return jsonify({"error": "No JSON data provided"}), 400
+        chat_request = ChatRequest(
+            message=message_content,
+            history=history,
+            model=model,
+            system_prompt=system_prompt,
+            temperature=temperature,
+        )
 
-        chat_request = ChatRequest(**data)
-
-        def generate():
+        def generate_stream():
+            """AI SDK v2.0.12準拠のストリーミング"""
             try:
                 for chunk in chat_service.process_chat_stream(chat_request):
-                    yield f"data: {json.dumps(chunk)}\n\n"
-                yield 'data: {"type": "complete"}\n\n'
+                    if chunk.get("type") == "data":
+                        # AI SDK v2.0.12形式
+                        yield f'0:"{escape_json_string(chunk["data"])}"\n'
+
+                # ストリーミング完了
+                completion_data = (
+                    'd:{"finishReason":"stop","usage":'
+                    '{"promptTokens":0,"completionTokens":0}}\n'
+                )
+                yield completion_data
+
             except Exception as e:
-                error_chunk = {"type": "error", "error": str(e)}
-                yield f"data: {json.dumps(error_chunk)}\n\n"
+                # エラー時
+                yield f'3:{{"error":"{escape_json_string(str(e))}"}}\n'
 
         return Response(
-            generate(),
-            mimetype="text/event-stream",
+            generate_stream(),
+            mimetype="text/plain",
             headers={
                 "Cache-Control": "no-cache",
                 "Connection": "keep-alive",
@@ -60,11 +81,39 @@ def chat_stream():
 
     except ValidationError as e:
         return jsonify({"error": "Invalid request data", "details": e.errors()}), 400
-
     except Exception as e:
         return jsonify({"error": "Internal server error", "message": str(e)}), 500
 
 
 @chat_bp.route("/health", methods=["GET"])
 def health():
+    """ヘルスチェックエンドポイント"""
     return jsonify({"status": "healthy"}), 200
+
+
+def extract_text_from_ui_message(ui_message: dict[str, Any]) -> str:
+    """UIMessageからテキスト内容を抽出"""
+    parts = ui_message.get("parts", [])
+    text_parts = [part.get("text", "") for part in parts if part.get("type") == "text"]
+    return "".join(text_parts) or ui_message.get("content", "")
+
+
+def build_message_history(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """AI SDK標準メッセージからメッセージ履歴を構築"""
+    history = []
+    for msg in messages:
+        if msg.get("role") in ["user", "assistant"]:
+            history.append(
+                {
+                    "id": msg.get("id", str(len(history))),
+                    "content": msg.get("content", ""),
+                    "role": msg["role"],
+                    "timestamp": int(time.time() * 1000),
+                }
+            )
+    return history
+
+
+def escape_json_string(text: str) -> str:
+    """JSON文字列内で安全にエスケープ"""
+    return text.replace('"', '\\"').replace("\n", "\\n").replace("\r", "\\r")
